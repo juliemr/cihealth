@@ -2,7 +2,8 @@
   "name": "cihealth",
   "author": "Julie Ralph <ju.ralph@gmail.com>",
   "dependencies": {
-    "request": "^2.53.0",
+    "request": "2.53.0",
+    "q": "1.2.0"
   },
   "version": "1.8.0"
 }
