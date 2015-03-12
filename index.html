@@ -1,0 +1,89 @@
+<html>
+  <head>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load("visualization", "1", {packages:["corechart"]});
+      google.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var xmlhttp = new XMLHttpRequest();
+        var url = "jobhistory.json";
+
+        xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            var data = JSON.parse(xmlhttp.responseText);
+            console.dir('got job history');
+            console.dir(data);
+            actualDraw(data);
+          }
+        }
+
+        xmlhttp.open("GET", url, true);
+        xmlhttp.send();
+
+        function actualDraw(data) {
+          var graphs = {
+            bsunit: 'JOB=unit BROWSER_PROVIDER=browserstack',
+            bsdocs: 'JOB=docs-e2e BROWSER_PROVIDER=browserstack',
+            bse2ejqlite: 'JOB=e2e TEST_TARGET=jqlite BROWSER_PROVIDER=browserstack',
+            bse2ejquery: 'JOB=e2e TEST_TARGET=jquery BROWSER_PROVIDER=browserstack',
+            slunit: 'JOB=unit BROWSER_PROVIDER=saucelabs',
+            sldocs: 'JOB=docs-e2e BROWSER_PROVIDER=saucelabs',
+            sle2ejqlite: 'JOB=e2e TEST_TARGET=jqlite BROWSER_PROVIDER=saucelabs',
+            sle2ejquery: 'JOB=e2e TEST_TARGET=jquery BROWSER_PROVIDER=saucelabs',
+          };
+
+          for (graph in graphs) {
+            var unitdata = data[graphs[graph]];
+            var container = document.getElementById(graph);
+
+            var dataArray = [['State', 'Count']];
+            var states = {};
+            for (var i = 0; i < unitdata.length; ++i) {
+              var state = unitdata[i].advancedState;
+              if (!states[state]) {
+                states[state] = 1;
+              } else {
+                states[state]++;
+              }
+            }
+            for (state in states) {
+              dataArray.push([state, states[state]]);
+            }
+
+            var chart = new google.visualization.BarChart(container);
+            var dataTable = google.visualization.arrayToDataTable(dataArray);
+            for (var i = 0; i < unitdata.length; ++i) {
+              // nothing yet
+            }
+
+            var options = {
+              title: graphs[graph],
+              width: 600,
+              height: 300,
+              bar: {groupWidth: "95%"},
+              legend: { position: "none" },
+            };
+
+            chart.draw(dataTable, options);
+          }
+        }
+      }
+    </script>
+    <style>
+      div {
+        display: inline-block;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="bsunit" style="width: 600px; height: 300px;"></div>
+    <div id="bsdocs" style="width: 600px; height: 300px;"></div>
+    <div id="bse2ejqlite" style="width: 600px; height: 300px;"></div>
+    <div id="bse2ejquery" style="width: 600px; height: 300px;"></div>
+    <div id="slunit" style="width: 600px; height: 300px;"></div>
+    <div id="sldocs" style="width: 600px; height: 300px;"></div>
+    <div id="sle2ejqlite" style="width: 600px; height: 300px;"></div>
+    <div id="sle2ejquery" style="width: 600px; height: 300px;"></div>
+  </body>
+</html>
