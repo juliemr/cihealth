@@ -3,9 +3,13 @@ var q = require('q');
 var fs = require('fs');
 var diagnose = require('./diagnose.js').diagnose;
 
+/**
+ * Run to output a job info file to jobhistory.json. This will download
+ * lots of logs to the folder ./logs/
+ */
+
 // This is the build number where Socket.io was upgraded. Only go that far back.
 var LAST_BUILD_NUMBER = 16958;
-// var LAST_BUILD_NUMBER = 17130;
 
 var TRAVIS_HEADERS = {
   Accept: 'application/vnd.travis-ci.2+json',
@@ -37,7 +41,7 @@ var diagnoseJob = function(jobInfo) {
         Accept: 'text/plain'
       }
     }).on('error', function() {
-      console.log('error');
+      console.log('error downloading log ' + jobInfo.id);
       haveLogDeferred.resolve();
     }).pipe(writer);
   } else {
@@ -73,8 +77,9 @@ var getJob = function(jobId) {
     diagnoseJob(jobInfo).then(function() {
       deferred.resolve()
     }, function(err) {
-      console.log('error');
+      console.log('error diagnosing job ' + jobInfo.id);
       console.dir(err);
+      deferred.reject(err);
     });
   });
   return deferred.promise;

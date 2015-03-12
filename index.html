@@ -2,7 +2,7 @@
   <head>
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript">
-      google.load("visualization", "1", {packages:["corechart"]});
+      google.load("visualization", "1.1", {packages:["bar"]});
       google.setOnLoadCallback(drawChart);
 
       function drawChart() {
@@ -51,18 +51,17 @@
               dataArray.push([state, states[state]]);
             }
 
-            var chart = new google.visualization.BarChart(container);
+            var chart = new google.charts.Bar(container);
             var dataTable = google.visualization.arrayToDataTable(dataArray);
             for (var i = 0; i < unitdata.length; ++i) {
               // nothing yet
             }
 
             var options = {
-              title: graphs[graph],
-              width: 600,
-              height: 300,
-              bar: {groupWidth: "95%"},
-              legend: { position: "none" },
+              chart: {
+                title: graphs[graph]
+              },
+              bars: 'horizontal'
             };
 
             chart.draw(dataTable, options);
