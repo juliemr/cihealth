@@ -1,10 +1,11 @@
 var request = require('request');
 var q = require('q');
 var fs = require('fs');
+var diagnose = require('./diagnose.js').diagnose;
 
 // This is the build number where Socket.io was upgraded. Only go that far back.
 // var LAST_BUILD_NUMBER = 16958;
-var LAST_BUILD_NUMBER = 17100;
+var LAST_BUILD_NUMBER = 17130;
 
 var TRAVIS_HEADERS = {
   Accept: 'application/vnd.travis-ci.2+json',
@@ -38,11 +39,12 @@ var diagnoseJob = function(jobInfo) {
       haveLogDeferred.resolve();
     }).pipe(writer);
   } else {
+    process.stdout.write('_');
     haveLogDeferred.resolve();
   }
 
-  return haveLogDeferred.then(function() {
-    
+  return haveLogDeferred.promise.then(function() {
+    return diagnose(jobInfo, logFile);
   });
 };
 
@@ -66,7 +68,12 @@ var getJob = function(jobId) {
       started_at: job.started_at
     }
     jobHistory[job.config.env].push(jobInfo);
-    diagnoseJob(jobInfo).then(deferred.resolve);
+    diagnoseJob(jobInfo).then(function() {
+      deferred.resolve()
+    }, function(err) {
+      console.log('error');
+      console.dir(err);
+    });
   });
   return deferred.promise;
 };
@@ -83,7 +90,12 @@ var getJobs = function(builds) {
     jobPromises.push(getJob(jobIds[j]));
   }
   q.all(jobPromises).then(function() {
+    console.log('---- Job History ----');
     console.dir(jobHistory);
+    fs.writeFileSync('jobhistory.json', JSON.stringify(jobHistory));
+  }, function(err) {
+    console.log('Error');
+    console.dir(err);
   });
 };
 
@@ -100,7 +112,6 @@ var getBuilds = function(afterNumber) {
     if (!error && response.statusCode == 200) {
       // Seems to always get 25 builds.
       var newBuilds = JSON.parse(body).builds;
-      // console.dir(newBuilds);
       builds = builds.concat(newBuilds);
       if (parseInt(builds[builds.length - 1].number) > LAST_BUILD_NUMBER) {
         console.dir('Getting 25 more builds');
