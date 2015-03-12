@@ -4,13 +4,15 @@ var fs = require('fs');
 var diagnose = require('./diagnose.js').diagnose;
 
 // This is the build number where Socket.io was upgraded. Only go that far back.
-// var LAST_BUILD_NUMBER = 16958;
-var LAST_BUILD_NUMBER = 17130;
+var LAST_BUILD_NUMBER = 16958;
+// var LAST_BUILD_NUMBER = 17130;
 
 var TRAVIS_HEADERS = {
   Accept: 'application/vnd.travis-ci.2+json',
   'User-Agent': 'AngularCiHealth'
 }
+
+var OUTFILE = 'jobhistory.json';
 
 var builds = [];
 var jobIds = [];
@@ -92,7 +94,7 @@ var getJobs = function(builds) {
   q.all(jobPromises).then(function() {
     console.log('---- Job History ----');
     console.dir(jobHistory);
-    fs.writeFileSync('jobhistory.json', JSON.stringify(jobHistory));
+    fs.writeFileSync(OUTFILE, JSON.stringify(jobHistory));
   }, function(err) {
     console.log('Error');
     console.dir(err);
