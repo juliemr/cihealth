@@ -1,0 +1,99 @@
+<html>
+  <head>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load("visualization", "1.1", {packages:["bar"]});
+      google.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var xmlhttp = new XMLHttpRequest();
+        var url = "jobhistory.json";
+
+        xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            var data = JSON.parse(xmlhttp.responseText);
+            console.dir(data);
+            actualDraw(data);
+          }
+        }
+
+        xmlhttp.open("GET", url, true);
+        xmlhttp.send();
+
+        function actualDraw(data) {
+          var graphs = {
+            bsunit: 'JOB=unit BROWSER_PROVIDER=browserstack',
+            bsdocs: 'JOB=docs-e2e BROWSER_PROVIDER=browserstack',
+            bse2ejqlite: 'JOB=e2e TEST_TARGET=jqlite BROWSER_PROVIDER=browserstack',
+            bse2ejquery: 'JOB=e2e TEST_TARGET=jquery BROWSER_PROVIDER=browserstack',
+            slunit: 'JOB=unit BROWSER_PROVIDER=saucelabs',
+            sldocs: 'JOB=docs-e2e BROWSER_PROVIDER=saucelabs',
+            sle2ejqlite: 'JOB=e2e TEST_TARGET=jqlite BROWSER_PROVIDER=saucelabs',
+            sle2ejquery: 'JOB=e2e TEST_TARGET=jquery BROWSER_PROVIDER=saucelabs',
+          };
+
+          var container = document.getElementById('container');
+
+          var dataArray = [['Test Type']];
+
+          var states = {};
+
+          for (graph in graphs) {
+            var subdata = data[graphs[graph]];
+
+            for (var i = 0; i < subdata.length; ++i) {
+              var state = subdata[i].advancedState;
+              if (!states[state]) {
+                states[state] = {};
+              }
+
+              if (!states[state][graph]) {
+                states[state][graph] = 1;
+              } else {
+                states[state][graph]++;
+              }
+            }
+          }
+
+          console.dir(states);
+
+          for (state in states) {
+            dataArray[0].push(state);
+          }
+
+          for (graph in graphs) {
+            var row = [graphs[graph]];
+            for (var i = 1; i < dataArray[0].length; ++i) {
+              var state = dataArray[0][i];
+              row.push(states[state][graph] ? states[state][graph] : 0);
+            }
+            dataArray.push(row);
+          }
+
+
+          console.dir(dataArray);
+
+          var chart = new google.charts.Bar(container);
+          var dataTable = google.visualization.arrayToDataTable(dataArray);
+
+          var options = {
+            chart: {
+              title: 'angular/angular.js CI history'
+            },
+            bars: 'horizontal'
+          };
+
+          chart.draw(dataTable, options);
+        }
+      }
+    </script>
+    <style>
+      div {
+        display: inline-block;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container" style="width: 1400px; height: 900px;"></div>
+  </body>
+</html>
