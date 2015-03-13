@@ -8,6 +8,12 @@ var exec = require('child_process').exec;
 // Note that the order here matters - the diagnoser will find the first
 // error and report that one, ignoring later matches.
 var STATES = [{
+    regexp: 'cb() never called',
+    state: 'npm install failed with cb() never called'
+  }, {
+    regexp: 'Error: .* Failed to instantiate module ng',
+    state: 'Failed to instantiate module ng'
+  }, {
     regexp: 'NoSuchWindowError',
     state: 'NoSuchWindowError'
   }, {
