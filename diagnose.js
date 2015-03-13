@@ -11,10 +11,10 @@ var STATES = [{
     regexp: 'NoSuchWindowError',
     state: 'NoSuchWindowError'
   }, {
-    regex: 'Disconnected (3 times)',
+    regexp: 'Disconnected (3 times)',
     state: 'Karma disconnected more than 2 times'
   }, {
-    regex: 'WARN \[launcher.browserstack\]: .* has not captured in 60000 ms, killing',
+    regexp: 'WARN \[launcher.browserstack\]: .* has not captured in 60000 ms, killing',
     state: 'BrowserStack could not capture browser'
   }, {
     regexp: 'UnknownCommandError: ERROR Job is not in progress',
@@ -67,6 +67,9 @@ var tryState = function(index, logFile) {
 exports.diagnose = function(jobInfo, logFile) {
   if (jobInfo.state === 'passed') {
     jobInfo.advancedState = 'pass';
+    return q(true);
+  } else if (jobInfo.state === 'started') {
+    jobInfo.advancedState = 'running';
     return q(true);
   } else {
     return tryState(0, logFile).then(function(advancedState) {
