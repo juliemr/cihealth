@@ -22,14 +22,14 @@
 
         function actualDraw(data) {
           var graphs = {
-            bsunit: 'JOB=unit BROWSER_PROVIDER=browserstack',
-            bsdocs: 'JOB=docs-e2e BROWSER_PROVIDER=browserstack',
-            bse2ejqlite: 'JOB=e2e TEST_TARGET=jqlite BROWSER_PROVIDER=browserstack',
-            bse2ejquery: 'JOB=e2e TEST_TARGET=jquery BROWSER_PROVIDER=browserstack',
-            slunit: 'JOB=unit BROWSER_PROVIDER=saucelabs',
-            sldocs: 'JOB=docs-e2e BROWSER_PROVIDER=saucelabs',
-            sle2ejqlite: 'JOB=e2e TEST_TARGET=jqlite BROWSER_PROVIDER=saucelabs',
-            sle2ejquery: 'JOB=e2e TEST_TARGET=jquery BROWSER_PROVIDER=saucelabs',
+            'BrowserStack unit': 'JOB=unit BROWSER_PROVIDER=browserstack',
+            'BrowserStack docs': 'JOB=docs-e2e BROWSER_PROVIDER=browserstack',
+            'BrowserStack e2e jqlite': 'JOB=e2e TEST_TARGET=jqlite BROWSER_PROVIDER=browserstack',
+            'BrowserStack e2e jquery': 'JOB=e2e TEST_TARGET=jquery BROWSER_PROVIDER=browserstack',
+            'SauceLabs unit': 'JOB=unit BROWSER_PROVIDER=saucelabs',
+            'SauceLabs docs': 'JOB=docs-e2e BROWSER_PROVIDER=saucelabs',
+            'SauceLabs e2e jqlite': 'JOB=e2e TEST_TARGET=jqlite BROWSER_PROVIDER=saucelabs',
+            'SauceLabs e2e jquery': 'JOB=e2e TEST_TARGET=jquery BROWSER_PROVIDER=saucelabs',
           };
 
           var container = document.getElementById('container');
@@ -62,7 +62,7 @@
           }
 
           for (graph in graphs) {
-            var row = [graphs[graph]];
+            var row = [graph];
             for (var i = 1; i < dataArray[0].length; ++i) {
               var state = dataArray[0][i];
               row.push(states[state][graph] ? states[state][graph] : 0);
