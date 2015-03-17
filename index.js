@@ -69,6 +69,7 @@ var getJob = function(jobId) {
     var jobInfo = {
       id: job.id,
       log_id: job.log_id,
+      build_id: job.build_id,
       number: job.number,
       state: job.state,
       started_at: job.started_at
@@ -91,7 +92,9 @@ var getJobs = function(builds) {
       jobIds = jobIds.concat(builds[i].job_ids);
     }
   }
-  console.dir('Getting job info for ' + jobIds.length + ' jobs');
+  console.log('Getting job info and logs for ' + jobIds.length + ' jobs');
+  // TODO - don't grab info again from jobs we've already processed
+  // if there's already a jobhistory.json file.
   jobPromises = [];
   for (var j = 0; j < jobIds.length; ++j) {
     jobPromises.push(getJob(jobIds[j]));
@@ -121,14 +124,16 @@ var getBuilds = function(afterNumber) {
       var newBuilds = JSON.parse(body).builds;
       builds = builds.concat(newBuilds);
       if (parseInt(builds[builds.length - 1].number) > LAST_BUILD_NUMBER) {
-        console.dir('Getting 25 more builds');
+        console.log('Getting 25 more builds');
         getBuilds(builds[builds.length - 1].number);
       } else {
-        console.dir('Got info for ' + builds.length + ' builds');
+        console.log('Got info for ' + builds.length + ' builds');
         getJobs(builds);
       }
     }
   });
 };
+
+// Main script starts here.
 
 getBuilds(null);

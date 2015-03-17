@@ -23,12 +23,12 @@
         function actualDraw(data) {
           var graphs = {
             'BrowserStack unit': 'JOB=unit BROWSER_PROVIDER=browserstack',
-            'BrowserStack docs': 'JOB=docs-e2e BROWSER_PROVIDER=browserstack',
-            'BrowserStack e2e jqlite': 'JOB=e2e TEST_TARGET=jqlite BROWSER_PROVIDER=browserstack',
-            'BrowserStack e2e jquery': 'JOB=e2e TEST_TARGET=jquery BROWSER_PROVIDER=browserstack',
             'SauceLabs unit': 'JOB=unit BROWSER_PROVIDER=saucelabs',
+            'BrowserStack docs': 'JOB=docs-e2e BROWSER_PROVIDER=browserstack',
             'SauceLabs docs': 'JOB=docs-e2e BROWSER_PROVIDER=saucelabs',
+            'BrowserStack e2e jqlite': 'JOB=e2e TEST_TARGET=jqlite BROWSER_PROVIDER=browserstack',
             'SauceLabs e2e jqlite': 'JOB=e2e TEST_TARGET=jqlite BROWSER_PROVIDER=saucelabs',
+            'BrowserStack e2e jquery': 'JOB=e2e TEST_TARGET=jquery BROWSER_PROVIDER=browserstack',
             'SauceLabs e2e jquery': 'JOB=e2e TEST_TARGET=jquery BROWSER_PROVIDER=saucelabs',
           };
 
@@ -42,7 +42,7 @@
             var subdata = data[graphs[graph]];
 
             for (var i = 0; i < subdata.length; ++i) {
-              var state = subdata[i].advancedState;
+              var state = subdata[i].reason;
               if (!states[state]) {
                 states[state] = {};
               }
