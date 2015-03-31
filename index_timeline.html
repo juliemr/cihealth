@@ -1,0 +1,88 @@
+<html>
+  <head>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+    <script type="text/javascript">
+      angular.module('ci', []).controller('Main', function($http) {
+        var self = this;
+
+        this.detail = false;
+
+        $http.get('jobhistory.json').success(function(data) {
+          console.dir(data);
+          self.data = data;
+          self.draw();
+        });
+
+        this.draw = function() {
+          var data = self.data;
+          var graphs = {
+            'BrowserStack unit': 'JOB=unit BROWSER_PROVIDER=browserstack',
+            'SauceLabs unit': 'JOB=unit BROWSER_PROVIDER=saucelabs',
+            'BrowserStack docs': 'JOB=docs-e2e BROWSER_PROVIDER=browserstack',
+            'SauceLabs docs': 'JOB=docs-e2e BROWSER_PROVIDER=saucelabs',
+            'BrowserStack e2e jqlite': 'JOB=e2e TEST_TARGET=jqlite BROWSER_PROVIDER=browserstack',
+            'SauceLabs e2e jqlite': 'JOB=e2e TEST_TARGET=jqlite BROWSER_PROVIDER=saucelabs',
+            'BrowserStack e2e jquery': 'JOB=e2e TEST_TARGET=jquery BROWSER_PROVIDER=browserstack',
+            'SauceLabs e2e jquery': 'JOB=e2e TEST_TARGET=jquery BROWSER_PROVIDER=saucelabs',
+          };
+
+          var container = document.getElementById('container');
+
+          var dataArray = [];
+
+          for (graph in graphs) {
+            var subdata = data[graphs[graph]];
+
+            for (var i = 0; i < subdata.length; ++i) {
+
+              var state = self.detail ? subdata[i].reason : subdata[i].advancedState;
+              
+              var start = new Date(subdata[i].started_at);
+              if (start < new Date(2015, 1, 1)) {
+                continue;
+              }
+
+              dataArray.push([
+                graph,
+                state,
+                new Date(subdata[i].started_at),
+                new Date(subdata[i].started_at)]);
+            }
+          }
+
+          var chart = new google.visualization.Timeline(container);
+
+          var dataTable = new google.visualization.DataTable();
+          dataTable.addColumn({ type: 'string', id: 'Test Type' });
+          dataTable.addColumn({ type: 'string', id: 'Status' });
+          dataTable.addColumn({ type: 'date', id: 'Start' });
+          dataTable.addColumn({ type: 'date', id: 'End' });
+          for (row in dataArray) {
+            dataTable.addRows([dataArray[row]]);
+          }
+
+          var options = {
+          };
+
+          chart.draw(dataTable, options);
+        };
+      });
+
+      google.load("visualization", "1.1", {packages:["timeline"]});
+    </script>
+    <style>
+      div {
+        display: inline-block;
+      }
+    </style>
+  </head>
+  <body ng-app="ci">
+    <div ng-controller="Main as main">
+      <label>Detail</label>
+      <input type="radio" ng-model="main.detail" ng-value="true" ng-change="main.draw()">Yes
+      <input type="radio" ng-model="main.detail" ng-value="false" ng-change="main.draw()">No
+      <div id="container" style="width: 1400px; height: 900px;"></div>
+    </div>
+  </body>
+</html>
